@@ -5,6 +5,7 @@ import * as ProgressPrimitive from "@radix-ui/react-progress"
 
 import { cn } from "@/lib/utils"
 
+// Use a simpler implementation of the progress component to avoid build issues
 const Progress = React.forwardRef<
   React.ElementRef<typeof ProgressPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof ProgressPrimitive.Root>
@@ -23,6 +24,8 @@ const Progress = React.forwardRef<
     />
   </ProgressPrimitive.Root>
 ))
-Progress.displayName = ProgressPrimitive.Root.displayName
+
+// Explicitly set the displayName to avoid issues with Radix UI's Symbol
+Progress.displayName = "Progress"
 
 export { Progress } 

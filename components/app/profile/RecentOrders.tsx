@@ -132,9 +132,11 @@ export function RecentOrders() {
       ) : orders.length === 0 ? (
         <div className="text-center py-8">
           <p className="text-gray-500 mb-4">You haven't placed any orders yet.</p>
-          <Button asChild className="bg-blue-600 hover:bg-blue-700">
-            <Link href="/products">Browse Products</Link>
-          </Button>
+          <Link href="/products">
+            <Button className="bg-blue-600 hover:bg-blue-700">
+              Browse Products
+            </Button>
+          </Link>
         </div>
       ) : (
         <div className="space-y-4">
@@ -199,12 +201,12 @@ export function RecentOrders() {
                   </div>
                   
                   <div className="flex justify-between mt-4 pt-3 border-t border-gray-100">
-                    <Button variant="outline" size="sm" asChild>
-                      <Link href={`/orders/${order.id}`}>
+                    <Link href={`/orders/${order.id}`}>
+                      <Button variant="outline" size="sm">
                         <ExternalLink className="h-4 w-4 mr-1" />
                         View Order
-                      </Link>
-                    </Button>
+                      </Button>
+                    </Link>
                     <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
                       Reorder
                     </Button>
