@@ -1,0 +1,368 @@
+# Rippa Tackle - AI Fishing Assistant MVP: Implementation Plan
+
+## 1. Database (Supabase)
+
+We'll create new tables for the AI Fishing Assistant, similar to the Vibe Quiz but tailored to its needs.
+
+**Table: `fishing_assistant_settings`**
+This table will store the core configuration for the AI Fishing Assistant.
+
+Columns:
+*   `id`: `uuid` (Primary Key, default: `gen_random_uuid()`)
+*   `instructions`: `text` (General instructions for the AI, e.g., "You are a helpful fishing assistant for Rippa Tackle.")
+*   `context`: `text` (Specific context, e.g., "Focus on carp fishing in the UK. Mention Rippa Tackle products when relevant but naturally.")
+*   `language`: `text` (e.g., "en-GB")
+*   `personality`: `text` (e.g., "Knowledgeable, friendly, and slightly humorous.")
+*   `avoid_topics`: `text` (e.g., "Politics, controversial subjects.")
+*   `openai_vector_store_id`: `text` (Hardcoded: `vs_68278c0e6dac819181a76e9350a95eac`) - This will store the ID for the knowledge base.
+*   `created_at`: `timestamptz` (default: `now()`)
+*   `updated_at`: `timestamptz` (default: `now()`)
+
+```sql
+-- fishing_assistant_settings table
+CREATE TABLE fishing_assistant_settings (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  instructions text,
+  context text,
+  language text DEFAULT 'en-GB',
+  personality text,
+  avoid_topics text,
+  openai_vector_store_id text NOT NULL,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+-- Insert initial settings row (can be done via Supabase UI or a seed script)
+INSERT INTO fishing_assistant_settings (openai_vector_store_id, instructions)
+VALUES ('vs_68278c0e6dac819181a76e9350a95eac', 'You are the Rippa Tackle AI Fishing Assistant. Your goal is to help anglers with advice on locations, species, methods, and recommend Rippa Tackle products where appropriate.');
+```
+
+**Table: `fishing_assistant_conversations`**
+Stores each user's interaction session with the AI assistant.
+
+Columns:
+*   `id`: `uuid` (Primary Key, default: `gen_random_uuid()`)
+*   `user_id`: `uuid` (References `auth.users(id)` ON DELETE SET NULL, nullable if guest users are allowed)
+*   `status`: `text` (e.g., 'active', 'completed', 'archived', default: 'active')
+*   `summary`: `text` (AI-generated summary of the conversation, optional)
+*   `user_preferences`: `jsonb` (Stores structured data like location, target species, methods)
+*   `created_at`: `timestamptz` (default: `now()`)
+*   `updated_at`: `timestamptz` (default: `now()`)
+*   `last_message_at`: `timestamptz`
+
+```sql
+-- fishing_assistant_conversations table
+CREATE TABLE fishing_assistant_conversations (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+  status text DEFAULT 'active',
+  summary text,
+  user_preferences jsonb,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  last_message_at timestamptz
+);
+```
+
+**Table: `fishing_assistant_messages`**
+Stores all messages (user and assistant) within a conversation.
+
+Columns:
+*   `id`: `uuid` (Primary Key, default: `gen_random_uuid()`)
+*   `conversation_id`: `uuid` (References `fishing_assistant_conversations(id)` ON DELETE CASCADE)
+*   `role`: `text` (NOT NULL, 'user' or 'assistant')
+*   `content`: `text` (NOT NULL)
+*   `openai_response_id`: `text` (Optional, OpenAI response ID)
+*   `token_count`: `integer` (Optional, token count for analytics)
+*   `created_at`: `timestamptz` (default: `now()`)
+
+```sql
+-- fishing_assistant_messages table
+CREATE TABLE fishing_assistant_messages (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  conversation_id uuid NOT NULL REFERENCES fishing_assistant_conversations(id) ON DELETE CASCADE,
+  role text NOT NULL,
+  content text NOT NULL,
+  openai_response_id text,
+  token_count integer,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+```
+
+**Table: `fishing_assistant_knowledge_documents`**
+Stores metadata about documents uploaded by admins to be used as knowledge for the AI Fishing Assistant, linked to the OpenAI vector store.
+
+Columns:
+*   `id`: `uuid` (Primary Key, default: `gen_random_uuid()`)
+*   `title`: `text` (NOT NULL)
+*   `description`: `text`
+*   `file_name`: `text` (Original name of the uploaded file)
+*   `file_size`: `integer` (Size of the file in bytes)
+*   `file_type`: `text` (MIME type of the file, e.g., 'application/pdf')
+*   `file_id`: `text` (Unique ID of the file stored in OpenAI, NOT NULL)
+*   `vector_store_id`: `text` (ID of the OpenAI vector store this file is associated with, `vs_68278c0e6dac819181a76e9350a95eac` for this project, NOT NULL)
+*   `processing_status`: `text` (e.g., 'processing', 'completed', 'error')
+*   `uploaded_by_user_id`: `uuid` (References `auth.users(id)` ON DELETE SET NULL)
+*   `created_at`: `timestamptz` (default: `now()`)
+*   `updated_at`: `timestamptz` (default: `now()`)
+
+```sql
+-- fishing_assistant_knowledge_documents table
+CREATE TABLE fishing_assistant_knowledge_documents (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  title text NOT NULL,
+  description text,
+  file_name text,
+  file_size integer,
+  file_type text,
+  file_id text NOT NULL,
+  vector_store_id text NOT NULL,
+  processing_status text DEFAULT 'processing',
+  uploaded_by_user_id uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+```
+
+## 2. Update Main Hero Section
+
+*   **Files to Update:**
+    *   Likely `app/page.tsx` or a specific Hero component (e.g., `components/landing/Hero.tsx`).
+    *   Content (text, imagery) needs to be changed to reflect "Rippa Tackle" and carp fishing.
+    *   Update any calls to action.
+
+*   **Action:**
+    1.  Identify the current Hero component.
+    2.  Modify its text content to be fishing-related (e.g., "Welcome to Rippa Tackle - Your Premier Carp Fishing Destination", "Discover the best gear and AI-powered advice").
+    3.  Replace images/videos with high-quality fishing-related visuals.
+    4.  Update any buttons or links (e.g., pointing to the new AI Fishing Assistant).
+
+## 3. AI Fishing Assistant - Frontend
+
+### 3.1. New AI Fishing Assistant Chat Component
+*   **Create File:** `components/app/fishing-assistant/FishingAssistantChat.tsx`
+    *   This will be similar in structure to `components/app/vibe-quiz/VibeQuizChat.tsx`.
+    *   It will handle the chat interface: message display, input field, sending messages to the backend.
+    *   It will need to:
+        *   Initiate a conversation.
+        *   Send user messages.
+        *   Display assistant responses.
+        *   Manage loading states and errors.
+        *   Interact with a new backend service (`fishing-assistant-service.ts`).
+        *   Initial prompt questions like: "Where are you planning to fish?", "What species are you targeting?", "What fishing methods are you familiar with?". These can be introductory messages from the assistant or placeholder prompts in the UI.
+
+### 3.2. Integrate into Home Page
+*   **File to Update:** `app/page.tsx` (or wherever the Vibe Quiz was, or a new section).
+*   **Action:**
+    1.  Import `FishingAssistantChat.tsx`.
+    2.  Add a section on the home page to embed this component.
+    3.  Ensure it's visually distinct and inviting.
+
+## 4. AI Fishing Assistant - Admin Section
+
+### 4.1. New Admin Page for Fishing Assistant
+*   **Create File:** `app/admin/fishing-assistant/page.tsx`
+    *   This page will be the main hub for managing the AI Fishing Assistant.
+    *   It can use a similar tabbed layout to `app/admin/vibe-quiz/page.tsx`.
+    *   Tabs needed:
+        *   **Settings:** Manage instructions, context, language, personality, vector store ID.
+        *   **Knowledge Documents:** Manage uploaded documents (upload, list, delete) linked to the OpenAI vector store.
+        *   **(Future) Analytics:** View conversation logs, user interactions.
+        *   **(Future) Test Bot:** Allow admin to test the assistant.
+
+### 4.2. Admin Settings Component
+*   **Create File:** `components/admin/fishing-assistant/AdminFishingAssistantSettings.tsx`
+    *   Analogous to `components/admin/vibe-quiz/AdminVibeQuizInstructions.tsx`.
+    *   Will provide a form to view and update the single row in the `fishing_assistant_settings` table.
+    *   Fields: Instructions, Context, Language, Personality, Avoid Topics.
+    *   The `openai_vector_store_id` (`vs_68278c0e6dac819181a76e9350a95eac`) will be displayed (read-only from the DB, as it's hardcoded or fetched from the single settings row).
+
+### 4.3. Admin Knowledge Documents Component
+*   **Create File:** `components/admin/fishing-assistant/AdminFishingAssistantDocuments.tsx`
+    *   This component will allow admins to manage knowledge documents for the AI assistant.
+    *   It will be similar to `components/admin/vibe-quiz/AdminVibeQuizDocuments.tsx` but adapted for uploading files to OpenAI and associating them with the vector store `vs_68278c0e6dac819181a76e9350a95eac`.
+    *   **Functionality:**
+        *   List existing documents from `fishing_assistant_knowledge_documents` table (displaying title, description, file name, status).
+        *   Provide an interface (e.g., a modal) to upload new documents:
+            *   File input for the document.
+            *   Input fields for `title` and `description`.
+        *   On submit, the file is sent to a backend API endpoint.
+        *   Ability to delete documents (which will also remove them from OpenAI and the vector store via backend calls).
+        *   Display status of documents (e.g., 'completed', 'processing', 'error').
+
+### 4.4. Update Admin Sidebar
+*   **File to Update:** `components/admin/admin-sidebar.tsx` (or equivalent).
+*   **Action:**
+    1.  Add a new link: "AI Fishing Assistant" pointing to `/admin/fishing-assistant`.
+    2.  Remove or repurpose the "Vibe Quiz" link if it's being fully replaced.
+
+## 5. AI Fishing Assistant - Backend
+
+### 5.1. New Fishing Assistant Service
+*   **Create File:** `lib/fishing-assistant-service.ts`
+    *   This service will handle all backend logic and Supabase interactions for the fishing assistant.
+    *   It will be similar to the provided `VenueAssistantService` example, using the OpenAI Responses API.
+    *   **Methods:**
+        *   `getSettings()`: Fetches the (single row of) settings from `fishing_assistant_settings`.
+        *   `updateSettings(settings: Partial<AdminFishingAssistantSettings>): Promise<AdminFishingAssistantSettings>`: Updates the settings.
+        *   `createConversation(userId?: string): Promise<FishingAssistantConversation>`: Creates a new conversation record in `fishing_assistant_conversations`.
+        *   `getConversation(id: string): Promise<FishingAssistantConversation | null>`: Retrieves a specific conversation.
+        *   `updateConversation(id: string, updates: Partial<FishingAssistantConversation>): Promise<FishingAssistantConversation>`: Updates a conversation with new data, such as user preferences.
+        *   `createMessage(conversationId: string, role: 'user' | 'assistant', content: string): Promise<FishingAssistantMessage>`: Adds a message to the conversation.
+        *   `getMessages(conversationId: string): Promise<FishingAssistantMessage[]>`: Gets all messages for a conversation.
+        *   `generateAIResponse(conversationId: string, userMessage: string, userContext?: any): Promise<string>`:
+            1.  Fetches conversation messages, settings, and documents.
+            2.  Constructs a structured system prompt with instructions, context, etc. from settings.
+            3.  Calls `openAIService.createResponse()` with the appropriate parameters, including the vector store ID (`vs_68278c0e6dac819181a76e9350a95eac`).
+            4.  Saves both user and assistant messages to `fishing_assistant_messages`.
+            5.  Returns the assistant's response text.
+        *   `listKnowledgeDocuments(): Promise<AdminFishingAssistantDocument[]>`: Fetches all documents from `fishing_assistant_knowledge_documents`.
+        *   `uploadKnowledgeDocument(file: File, title: string, description: string | undefined, uploadedByUserId: string): Promise<AdminFishingAssistantDocument>`:
+            1.  Uploads the file to OpenAI using `openAIService.uploadVectorStoreFile()`.
+            2.  Creates a record in `fishing_assistant_knowledge_documents` with status 'completed' (or 'processing' then update).
+            3.  Returns the created document record.
+        *   `deleteKnowledgeDocument(documentId: string, fileId: string): Promise<void>`:
+            1.  Removes the file from the OpenAI vector store using `openAIService.deleteVectorStoreFile()`.
+            2.  Deletes the record from `fishing_assistant_knowledge_documents` using `documentId`.
+        *   `updateKnowledgeDocumentMetadata(documentId: string, metadata: Partial<{title: string, description: string}>): Promise<AdminFishingAssistantDocument>`: Updates title/description in the database.
+
+### 5.2. New API Routes
+Create new API routes under `app/api/fishing-assistant/`.
+
+*   **Settings Management:**
+    *   `app/api/fishing-assistant/admin/settings/route.ts`:
+        *   `GET`: Calls `fishingAssistantService.getSettings()`.
+        *   `POST` or `PUT`: Calls `fishingAssistantService.updateSettings()`.
+*   **Chat Interaction:**
+    *   `app/api/fishing-assistant/chat/route.ts` (or more specific routes):
+        *   `POST /init`: Calls `fishingAssistantService.createConversation()`. Returns conversation ID.
+        *   `POST /message`: Takes `conversationId` and `userMessage`. Calls `fishingAssistantService.generateAIResponse()`. Returns assistant's response.
+        *   `GET /messages`: Takes `conversationId`. Calls `fishingAssistantService.getMessages()`.
+*   **Knowledge Document Management (Admin):**
+    *   `app/api/fishing-assistant/admin/documents/route.ts`:
+        *   `GET`: Calls `fishingAssistantService.listKnowledgeDocuments()`.
+        *   `POST`: Handles new document upload. Expects multipart/form-data (file, title, description). Calls `fishingAssistantService.uploadKnowledgeDocument()`.
+        *   `PUT` (or `PATCH` with `?id=`): Calls `fishingAssistantService.updateKnowledgeDocumentMetadata()`.
+    *   `app/api/fishing-assistant/admin/documents/[documentId]/route.ts` (or use query params like `?id=&fileId=`):
+        *   `DELETE`: Takes `documentId` and `fileId`. Calls `fishingAssistantService.deleteKnowledgeDocument()`.
+
+### 5.3. OpenAI Integration
+*   The `fishing-assistant-service.ts` will use `openAIService` similar to the `VenueAssistantService` example.
+*   Key interactions:
+    *   **Chat Completions with Vector Store**: Using OpenAI Responses API via `openAIService.createResponse()` with the `file_search` tool.
+    *   **Vector Store Management**:
+        *   `openAIService.uploadVectorStoreFile(vectorStoreId, file)` for uploads.
+        *   `openAIService.deleteVectorStoreFile(vectorStoreId, fileId)` for deletions.
+    *   The system prompt, context, and other instructions will come from the `fishing_assistant_settings` table.
+
+## 6. Type Definitions
+
+*   **File to Update:** `lib/types.ts`
+*   **Action:** Add new interfaces for the Fishing Assistant.
+
+```typescript
+// lib/types.ts
+
+// ... existing types ...
+
+// AI Fishing Assistant: Admin-facing Settings
+export interface AdminFishingAssistantSettings {
+  id: string;
+  instructions?: string;
+  context?: string;
+  language?: string;
+  personality?: string;
+  avoid_topics?: string;
+  openai_vector_store_id: string;
+  created_at: string;
+  updated_at: string;
+}
+
+// AI Fishing Assistant: Conversation
+export interface FishingAssistantConversation {
+  id: string;
+  user_id?: string; // Nullable for guest users
+  status: string;
+  summary?: string;
+  user_preferences?: { // Example, can be expanded
+    location?: string;
+    species?: string[];
+    methods?: string[];
+  };
+  created_at: string;
+  updated_at: string;
+  last_message_at?: string;
+}
+
+// AI Fishing Assistant: Message
+export interface FishingAssistantMessage {
+  id: string;
+  conversation_id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  openai_response_id?: string;
+  token_count?: number;
+  created_at: string;
+}
+
+// AI Fishing Assistant: Admin-facing Knowledge Document
+export interface AdminFishingAssistantDocument {
+  id: string;
+  title: string;
+  description?: string;
+  file_name?: string;
+  file_size?: number;
+  file_type?: string;
+  file_id: string;
+  vector_store_id: string;
+  processing_status: string; // e.g., 'processing', 'completed', 'error'
+  uploaded_by_user_id?: string;
+  created_at: string;
+  updated_at: string;
+}
+```
+
+## 7. Refactor/Remove Vibe Quiz (Post-MVP or Parallel Task)
+
+*   Once the AI Fishing Assistant is stable and meets requirements, systematically remove or disable Vibe Quiz components, services, API routes, and Supabase tables if it's a full replacement.
+*   If it's an addition, ensure no conflicts and clear separation. For this project, it sounds like a replacement.
+
+## Summary of New Files/Folders:
+
+*   `codefishingai.txt` (this file)
+*   `components/app/fishing-assistant/FishingAssistantChat.tsx`
+*   `app/admin/fishing-assistant/page.tsx`
+*   `components/admin/fishing-assistant/AdminFishingAssistantSettings.tsx`
+*   `components/admin/fishing-assistant/AdminFishingAssistantDocuments.tsx`
+*   `lib/fishing-assistant-service.ts`
+*   `app/api/fishing-assistant/admin/settings/route.ts`
+*   `app/api/fishing-assistant/admin/documents/route.ts`
+*   `app/api/fishing-assistant/admin/documents/[documentId]/route.ts` (example for specific document actions)
+*   `app/api/fishing-assistant/chat/route.ts` (and potentially sub-routes like `/init`, `/message`)
+
+## Key Steps & Order of Implementation:
+
+1.  **Database Setup:** Create `fishing_assistant_settings`, `fishing_assistant_conversations`, `fishing_assistant_messages`, and `fishing_assistant_knowledge_documents` tables in Supabase. Insert initial settings.
+2.  **Types:** Add new types to `lib/types.ts`.
+3.  **Backend Service (`fishing-assistant-service.ts`):**
+    *   Implement `getSettings`, `updateSettings`.
+    *   Implement OpenAI Responses API integration using `openAIService.createResponse()` with the vector store ID `vs_68278c0e6dac819181a76e9350a95eac`.
+    *   Implement `createConversation`, `createMessage`, `generateAIResponse`.
+    *   Implement `listKnowledgeDocuments`, `uploadKnowledgeDocument`, `deleteKnowledgeDocument`, `updateKnowledgeDocumentMetadata`.
+4.  **Admin Section:**
+    *   Create `AdminFishingAssistantSettings.tsx` component.
+    *   Create `AdminFishingAssistantDocuments.tsx` component.
+    *   Create API routes:
+        *   `app/api/fishing-assistant/admin/settings/route.ts`
+        *   `app/api/fishing-assistant/admin/documents/route.ts` (and potentially `/[documentId]/route.ts`)
+    *   Create `app/admin/fishing-assistant/page.tsx` and integrate the settings and documents components with tabs.
+    *   Update admin sidebar.
+5.  **Frontend Chat Component:**
+    *   Create `FishingAssistantChat.tsx`.
+    *   Create `app/api/fishing-assistant/chat/route.ts` API for chat interactions.
+    *   Integrate `FishingAssistantChat.tsx` into the main home page (`app/page.tsx`).
+6.  **Hero Section Update:** Modify content and visuals.
+7.  **Testing:** Thoroughly test admin settings, document management, and the user-facing chat.
+8.  **Refinement & Iteration:** Based on testing, refine prompts, AI behaviour, and UI.
+
+This plan provides a comprehensive roadmap for developing the AI Fishing Assistant MVP using the OpenAI Responses API approach. The admin will be able to upload knowledge documents directly through the `AdminFishingAssistantDocuments.tsx` component, which will then be stored with OpenAI and associated with the vector store `vs_68278c0e6dac819181a76e9350a95eac`. The chat interactions will leverage the OpenAI Responses API with the file_search tool to access this knowledge base. 

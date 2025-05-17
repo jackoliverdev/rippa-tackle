@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+ 
+@layer base {
+  :root {
+    --background: 210 50% 95%; /* Light Blue #EBF5FB */
+    --foreground: 215 30% 25%; /* Dark Blue #2A4365 */
+
+    --card: 0 0% 100%; /* White */
+    --card-foreground: 215 30% 25%;
+ 
+    --popover: 210 50% 95%; /* Light Blue */
+    --popover-foreground: 215 30% 25%;
+ 
+    --primary: 200 60% 50%; /* Blue #3498DB */
+    --primary-foreground: 0 0% 100%; /* White */
+ 
+    --secondary: 145 55% 25%; /* Forest Green to match logo */
+    --secondary-foreground: 215 30% 25%;
+ 
+    --muted: 210 40% 90%;
+    --muted-foreground: 215 20% 45%;
+ 
+    --accent: 210 40% 90%;
+    --accent-foreground: 215 30% 25%;
+ 
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 210 40% 85%; /* Light Blue Border */
+    --input: 210 40% 85%;
+    --ring: 200 60% 50%; /* Blue Ring */
+ 
+    --radius: 0.5rem;
+  }
+ 
+  .dark {
+    --background: 215 30% 15%;
+    --foreground: 210 40% 98%;
+ 
+    --card: 215 30% 15%;
+    --card-foreground: 210 40% 98%;
+ 
+    --popover: 215 30% 15%;
+    --popover-foreground: 210 40% 98%;
+ 
+    --primary: 210 40% 98%;
+    --primary-foreground: 222 47% 11%;
+ 
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 98%;
+ 
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
+ 
+    --accent: 217 33% 17%;
+    --accent-foreground: 210 40% 98%;
+ 
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 40% 98%;
+ 
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 212 27% 84%;
+  }
+}
+ 
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}

@@ -1,0 +1,236 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# RIPPA DEMO PROJECT BRIEF
+
+## PROJECT OVERVIEW
+
+**Client**: Jacob Worth (@jacob_londoncarper) - Rippa Tackle  
+**Store**: rippatackle.com (Shopify-powered)  
+**Developer**: You (UK-based software dev & carp angler)  
+**Goal**: Build impressive demo to secure £5k headless Shopify rebuild contract  
+**Timeline**: Demo needed ASAP for upcoming call with Jacob  
+
+## CURRENT STATE ANALYSIS
+
+### Existing Site Issues
+- **Boring Generic Template**: Standard Shopify theme, zero personality
+- **Poor Product Discovery**: Basic grid layout, weak categorization
+- **Weak Bundle/Mystery Box Presentation**: Static images, no interactivity
+- **Amateur Visual Hierarchy**: Cluttered navigation, poor information architecture
+- **Backend Pain Points**: Standard Shopify admin - Jacob wants easier product/order management
+
+### Client Background
+- **Jacob Worth**: Professional carp angler turned tackle business owner
+- **Pain Point**: Spends too much time on admin, wants more time fishing
+- **Business Model**: Fishing tackle + bait + mystery boxes + specialized bundles
+- **Target Audience**: UK carp anglers (rig builders, bait seekers, gear enthusiasts)
+
+## TECHNICAL STRATEGY
+
+### Chosen Approach: Headless Shopify
+**Why Headless Wins:**
+- ✅ Keep existing Shopify backend (inventory, orders, payments)
+- ✅ Build custom React/Next.js frontend
+- ✅ Zero payment integration risk
+- ✅ Faster demo development
+- ✅ Easy to showcase "before/after"
+
+### Tech Stack
+```
+Frontend: Next.js 14 + React + TypeScript
+Styling: Tailwind CSS
+Backend: Shopify Storefront API + Admin API
+Database: Shopify (products/orders) + Supabase (user data/AI interactions)
+AI: OpenAI GPT-4 (bundle builder)
+Deployment: Vercel (free tier)
+Auth: Firebase Auth (your boilerplate)
+```
+
+## DEMO FEATURES (3 PILLARS)
+
+### 1. SICK FRONTEND REDESIGN
+**Current State**: Generic Shopify template
+**Demo State**: Custom fishing-focused design
+
+**Key Improvements:**
+- Hero section with proper carp fishing imagery
+- Advanced product filtering (by technique, fish species, venue type)
+- Dynamic product cards with hover effects
+- Improved navigation with fishing-category dropdowns
+- Mobile-first responsive design
+- Dark/light theme toggle
+
+### 2. AI BUNDLE BUILDER (WOW FACTOR)
+**Feature**: Interactive AI that builds custom tackle bundles
+
+**User Flow:**
+1. Click "Custom Bundle Builder" from bundles page
+2. AI asks fishing scenario questions:
+   - "Where are you fishing?" (lake, river, syndicate)
+   - "What's your target species?" (carp, roach, bream)
+   - "What technique?" (zig rig, chod rig, solid bag)
+   - "Session length?" (day ticket, overnight, weekend)
+   - "Experience level?" (beginner, intermediate, expert)
+3. AI builds recommended bundle with explanations
+4. User can modify, remove items, ask questions
+5. Add bundle to cart with one click
+
+**Admin Control Panel:**
+- Configure AI questions/responses
+- Set conditional logic for recommendations
+- View conversation analytics
+- Manage product mappings for AI suggestions
+
+### 3. ENHANCED PRODUCT EXPERIENCE
+**Mystery Boxes:**
+- Interactive hover previews
+- "What could be inside?" expandable sections
+- Value calculators showing potential savings
+- Social proof (recent purchases, reviews)
+
+**Product Pages:**
+- Multiple angle product images
+- Detailed specifications in tabs
+- "Frequently bought together" suggestions
+- Technique-specific use cases
+- Customer photos/catches
+
+## DATA INTEGRATION
+
+### Product Data (from CSV)
+```
+Total Products: 468 across 32 fields
+Key Categories:
+- Bait (boilies, pellets, liquids)
+- Tackle (rods, reels, terminal tackle)
+- Clothing (hoodies, t-shirts)
+- Bundles (technique-specific packages)
+- Mystery Boxes (different value tiers)
+```
+
+### Shopify API Integration
+```javascript
+// Storefront API for frontend
+const storefront = new Shopify.Storefront({
+  domain: 'rippatackle.myshopify.com',
+  accessToken: 'your-storefront-token'
+});
+
+// Admin API for management
+const admin = new Shopify.Admin({
+  domain: 'rippatackle.myshopify.com',
+  accessToken: 'your-admin-token'
+});
+```
+
+## IMPLEMENTATION PLAN
+
+### Phase 1: Setup (2 hours)
+1. Create Next.js project from your boilerplate
+2. Set up Shopify Storefront API connection
+3. Import product data and test API calls
+4. Deploy basic shell to Vercel
+
+### Phase 2: Frontend Redesign (8 hours)
+1. Design system creation (colors, typography, components)
+2. Homepage with hero, featured products, categories
+3. Product listing with filters and search
+4. Individual product pages
+5. Bundle/mystery box showcases
+
+### Phase 3: AI Bundle Builder (6 hours)
+1. OpenAI integration setup
+2. Question flow UI components
+3. AI prompt engineering for tackle recommendations
+4. Shopping cart integration
+5. Admin panel for AI configuration
+
+### Phase 4: Polish & Deploy (2 hours)
+1. Performance optimization
+2. Mobile responsiveness check
+3. Final deployment with custom domain
+4. Demo script preparation
+
+## BRITISH TERMINOLOGY & SPECIFICS
+
+### Carp Fishing Terms to Use
+- "On the bank" (fishing)
+- "Bivvy" (shelter)
+- "Rig" (tackle setup)
+- "Bait up" (feed the swim)
+- "Session" (fishing trip)
+- "Big mirror" (large mirror carp)
+- "Syndicate water" (exclusive fishery)
+
+### Product Categories to Emphasize
+- **Terminal Tackle**: Hooks, leads, swivels
+- **Rig Components**: Hair needles, PVA, tubing
+- **Bait Selection**: Boilies, pellets, pop-ups
+- **Venue Types**: Day ticket vs syndicate fishing
+
+## DEMO SCRIPT OUTLINE
+
+### Opening Hook (2 minutes)
+"Right Jacob, I've been on your site, and as both a dev and an angler, I can see massive potential. Let me show you what I've knocked up..."
+
+### Feature Walkthrough (8 minutes)
+1. **New Homepage**: "Look how this immediately screams 'proper tackle shop'"
+2. **Product Discovery**: "Watch how easy it is to find exactly what you need"
+3. **AI Bundle Builder**: "This is where it gets interesting - tell it your session, watch it build your setup"
+
+### Business Impact (3 minutes)
+1. **Customer Experience**: Higher conversion, larger baskets
+2. **Admin Efficiency**: "You'll spend 80% less time managing this"
+3. **Competitive Advantage**: "No other tackle shop has anything like this"
+
+### Close (2 minutes)
+"This is just the demo. Imagine what we can build in 4 weeks. Fancy a chat about making this live?"
+
+## SUCCESS METRICS
+
+### Immediate Demo Goals
+- [ ] Jacob says "Fuck me, how'd you do that?"
+- [ ] Secures follow-up technical discussion
+- [ ] Gets agreement on headless approach
+- [ ] Closes £5k contract
+
+### Project Success Criteria (Post-Demo)
+- 35% improvement in conversion rate
+- 50% increase in average order value  
+- 70% reduction in admin time for Jacob
+- Launch within 4 weeks of contract signing
+
+## TECHNICAL CONSIDERATIONS
+
+### Shopify Limitations to Address
+- Rate limiting on API calls
+- Image optimization requirements  
+- SEO considerations for headless setup
+- Checkout flow customization limits
+
+### Performance Targets
+- <2s page load times
+- 90+ Lighthouse score
+- Mobile-first optimization
+- Image lazy loading throughout
+
+## CONTINGENCY PLANS
+
+### If Demo Breaks During Call
+1. Have local backup ready
+2. Screen recording of full demo as fallback
+3. Static images of key features prepared
+
+### If Jacob Prefers Different Approach
+- Be flexible on timeline/budget
+- Offer PHP/Shopify Liquid alternative if needed
+- Pivot to API integration focus if preferred
+
+---
+
+**Bottom Line**: Build something that makes Jacob think "This guy gets fishing AND tech" while solving his real business problems. The AI bundle builder is your ace card - no other tackle shop has anything close.
+
+**Remember**: Keep it fishing-focused, technically impressive, but explain in terms Jacob understands. You're not just building a website, you're giving him more time on the bank.
