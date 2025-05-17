@@ -23,6 +23,6 @@ const OrSeparator = React.forwardRef<
     <Separator className="shrink" />
   </div>
 ));
-OrSeparator.displayName = SeparatorPrimitive.Root.displayName;
+OrSeparator.displayName = "OrSeparator";
 
 export { OrSeparator };
