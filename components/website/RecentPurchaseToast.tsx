@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { X } from 'lucide-react';
+import Image from 'next/image';
+import { X, Package } from 'lucide-react';
 import { getRandomProducts } from '@/lib/products-service';
 
 // Names for random generation
@@ -24,12 +25,10 @@ const locations = [
   'Hertfordshire', 'Kent', 'Essex', 'Surrey', 'Hampshire',
   'West Midlands', 'Cheshire', 'West Yorkshire', 'Dorset', 'Buckinghamshire',
   'Lancashire', 'Warwickshire', 'Norfolk', 'Berkshire', 'Staffordshire',
-  
-  // Fishing-specific areas
-  'Linear Fisheries', 'Drayton Reservoir', 'Kingsbury Water Park', 
-  'Walthamstow Reservoirs', 'Tattershall Lakes', 'St Johns', 'Bluebell Lakes',
-  'Wraysbury', 'Redesmere', 'Wykeham Lakes', 'River Lea', 'River Trent',
-  'Chew Valley Lake', 'River Severn', 'Oxlease Lake', 'Waltham Abbey'
+  'Derbyshire', 'Somerset', 'Gloucestershire', 'Wiltshire', 'Leicestershire',
+  'Cambridgeshire', 'Devon', 'Suffolk', 'Northamptonshire', 'Oxfordshire',
+  'Northumberland', 'Cumbria', 'Cornwall', 'Lincolnshire', 'North Yorkshire',
+  'East Sussex', 'West Sussex', 'Shropshire', 'Worcestershire', 'Durham'
 ];
 
 interface RecentPurchaseToastProps {
@@ -38,7 +37,7 @@ interface RecentPurchaseToastProps {
 }
 
 export function RecentPurchaseToast({ 
-  interval = 30000, // 30 seconds between toasts
+  interval = 60000, // 60 seconds between toasts
   showDuration = 5000 // Show toast for 5 seconds
 }: RecentPurchaseToastProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -47,6 +46,7 @@ export function RecentPurchaseToast({
     location: string;
     productName: string;
     productSlug: string;
+    productImage?: string;
   } | null>(null);
   const [products, setProducts] = useState<any[]>([]);
   const [isMobile, setIsMobile] = useState(false);
@@ -96,12 +96,25 @@ export function RecentPurchaseToast({
       // Pick random product
       const product = products[Math.floor(Math.random() * products.length)];
       
+      // Get product image URL if available
+      let productImage;
+      if (product.images && product.images.length > 0) {
+        // Check if images is an array of objects or strings
+        if (typeof product.images[0] === 'string') {
+          productImage = product.images[0];
+        } else {
+          const primaryImage = product.images.find((img: any) => img.isPrimary) || product.images[0];
+          productImage = primaryImage.url;
+        }
+      }
+      
       // Create toast data
       setToast({
         name: `${firstName} ${lastInitial}`,
         location,
         productName: product.name,
-        productSlug: product.slug
+        productSlug: product.slug,
+        productImage
       });
       
       // Show toast
@@ -133,13 +146,31 @@ export function RecentPurchaseToast({
 
   return (
     <div 
-      className={`fixed bottom-6 left-6 z-50 max-w-xs bg-white rounded-lg shadow-lg border border-slate-200 transition-all duration-500 ${
+      className={`fixed bottom-6 left-6 z-50 max-w-sm bg-white rounded-lg shadow-lg border border-slate-200 transition-all duration-500 ${
         isOpen 
           ? 'opacity-100 translate-y-0' 
           : 'opacity-0 translate-y-10 pointer-events-none'
       }`}
     >
       <div className="flex items-start p-4">
+        <div className="flex-shrink-0 mr-3">
+          <div className="h-12 w-12 rounded-md overflow-hidden bg-gray-100">
+            {toast.productImage ? (
+              <Image
+                src={toast.productImage}
+                alt={toast.productName}
+                width={48}
+                height={48}
+                className="h-12 w-12 object-cover"
+              />
+            ) : (
+              <div className="flex items-center justify-center h-full w-full">
+                <Package className="h-6 w-6 text-gray-400" />
+              </div>
+            )}
+          </div>
+        </div>
+        
         <div className="flex-1">
           <div className="flex justify-between items-start">
             <p className="text-sm font-medium text-slate-900">

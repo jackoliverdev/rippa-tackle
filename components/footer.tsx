@@ -75,28 +75,25 @@ export const Footer = () => {
         </div>
       </div>
 
-      {/* Main footer */}
-      <div className="bg-slate-900 py-8">
+      {/* Main footer - SIMPLIFIED */}
+      <div className="bg-slate-900 py-6">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {/* Column 1: About */}
-            <div>
-              <div className="flex items-center mb-4">
+            <div className="flex flex-col items-center md:items-start">
+              <div className="flex items-center mb-3">
                 <Image 
                   src="/rippa_logo.png" 
                   alt="Rippa Tackle"
-                  width={48} 
-                  height={48}
-                  className="h-12 w-12 mr-2" 
+                  width={40} 
+                  height={40}
+                  className="h-10 w-10 mr-2" 
                 />
-                <span className="text-xl font-bold">
+                <span className="text-lg font-bold">
                   RIPPA <span className="text-blue-400">TACKLE</span>
                 </span>
               </div>
-              <p className="text-sm text-gray-300 mb-4">
-                The UK's premier fishing tackle and equipment supplier, providing quality gear for anglers since 2010.
-              </p>
-              <div className="flex space-x-3">
+              <div className="flex space-x-3 mb-3">
                 <Link href="#" className="bg-slate-800 hover:bg-blue-500 p-2 rounded-full transition-all duration-200">
                   <FacebookIcon className="h-4 w-4" />
                 </Link>
@@ -107,56 +104,41 @@ export const Footer = () => {
                   <YoutubeIcon className="h-4 w-4" />
                 </Link>
               </div>
+              <div className="flex items-center text-sm text-gray-300">
+                <Mail className="h-4 w-4 text-blue-400 mr-1.5 flex-shrink-0" />
+                <span>info@rippatackle.com</span>
+              </div>
             </div>
 
-            {/* Column 2: Shop */}
+            {/* Column 2: Home */}
             <div>
-              <h3 className="text-sm font-bold uppercase mb-4 border-b border-slate-800 pb-2">Shop</h3>
-              <ul className="space-y-2">
+              <h3 className="text-sm font-bold uppercase mb-3 border-b border-slate-800 pb-1">Home</h3>
+              <ul className="space-y-1">
+                <li><Link href="/" className="text-gray-300 hover:text-blue-400 text-sm">Home</Link></li>
+                <li><Link href="/about" className="text-gray-300 hover:text-blue-400 text-sm">About Us</Link></li>
+                <li><Link href="/contact" className="text-gray-300 hover:text-blue-400 text-sm">Contact</Link></li>
+                <li><Link href="/faqs" className="text-gray-300 hover:text-blue-400 text-sm">FAQs</Link></li>
+              </ul>
+            </div>
+
+            {/* Column 3: Shop */}
+            <div>
+              <h3 className="text-sm font-bold uppercase mb-3 border-b border-slate-800 pb-1">Shop</h3>
+              <ul className="space-y-1">
+                <li><Link href="/products" className="text-gray-300 hover:text-blue-400 text-sm">All Products</Link></li>
                 <li><Link href="/sale" className="text-gray-300 hover:text-blue-400 text-sm">Sale</Link></li>
                 <li><Link href="/new-in" className="text-gray-300 hover:text-blue-400 text-sm">New In</Link></li>
-                <li><Link href="/carp" className="text-gray-300 hover:text-blue-400 text-sm">Carp</Link></li>
-                <li><Link href="/tackle" className="text-gray-300 hover:text-blue-400 text-sm">Tackle</Link></li>
-                <li><Link href="/bait" className="text-gray-300 hover:text-blue-400 text-sm">Bait</Link></li>
-                <li><Link href="/clothing" className="text-gray-300 hover:text-blue-400 text-sm">Clothing</Link></li>
                 <li><Link href="/brands" className="text-gray-300 hover:text-blue-400 text-sm">Brands</Link></li>
               </ul>
             </div>
 
-            {/* Column 3: Help */}
+            {/* Column 4: Content */}
             <div>
-              <h3 className="text-sm font-bold uppercase mb-4 border-b border-slate-800 pb-2">Help & Info</h3>
-              <ul className="space-y-2">
-                <li><Link href="/about" className="text-gray-300 hover:text-blue-400 text-sm">About Us</Link></li>
-                <li><Link href="/delivery" className="text-gray-300 hover:text-blue-400 text-sm">Delivery Information</Link></li>
-                <li><Link href="/returns" className="text-gray-300 hover:text-blue-400 text-sm">Returns Policy</Link></li>
-                <li><Link href="/faqs" className="text-gray-300 hover:text-blue-400 text-sm">FAQs</Link></li>
-                <li><Link href="/contact" className="text-gray-300 hover:text-blue-400 text-sm">Contact Us</Link></li>
+              <h3 className="text-sm font-bold uppercase mb-3 border-b border-slate-800 pb-1">Content</h3>
+              <ul className="space-y-1">
                 <li><Link href="/blogs" className="text-gray-300 hover:text-blue-400 text-sm">Blogs</Link></li>
                 <li><Link href="/videos" className="text-gray-300 hover:text-blue-400 text-sm">Videos</Link></li>
-              </ul>
-            </div>
-
-            {/* Column 4: Contact */}
-            <div>
-              <h3 className="text-sm font-bold uppercase mb-4 border-b border-slate-800 pb-2">Contact Us</h3>
-              <ul className="space-y-4">
-                <li className="flex items-start">
-                  <MapPin className="h-5 w-5 text-blue-400 mr-2 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm text-gray-300">
-                    Unit 7, Riverside Industrial Estate<br />
-                    Harlow, Essex<br />
-                    CM20 2QE
-                  </span>
-                </li>
-                <li className="flex items-center">
-                  <Phone className="h-5 w-5 text-blue-400 mr-2 flex-shrink-0" />
-                  <span className="text-sm text-gray-300">01279 123456</span>
-                </li>
-                <li className="flex items-center">
-                  <Mail className="h-5 w-5 text-blue-400 mr-2 flex-shrink-0" />
-                  <span className="text-sm text-gray-300">info@rippatackle.com</span>
-                </li>
+                <li><Link href="/fishing-tips" className="text-gray-300 hover:text-blue-400 text-sm">Fishing Tips</Link></li>
               </ul>
             </div>
           </div>
@@ -164,16 +146,15 @@ export const Footer = () => {
       </div>
 
       {/* Bottom footer */}
-      <div className="bg-slate-800 py-4">
+      <div className="bg-slate-800 py-3">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center justify-between">
-            <p className="text-xs text-gray-400 mb-2 md:mb-0">
+            <p className="text-xs text-gray-400 mb-1 md:mb-0">
               © {new Date().getFullYear()} Rippa Tackle. All rights reserved.
             </p>
             <div className="flex space-x-4">
               <Link href="/privacy" className="text-xs text-gray-400 hover:text-blue-400">Privacy Policy</Link>
               <Link href="/terms" className="text-xs text-gray-400 hover:text-blue-400">Terms & Conditions</Link>
-              <Link href="/cookies" className="text-xs text-gray-400 hover:text-blue-400">Cookie Policy</Link>
             </div>
           </div>
         </div>

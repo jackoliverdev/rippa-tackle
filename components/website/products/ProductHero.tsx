@@ -196,7 +196,7 @@ export const ProductHero = () => {
           
           {/* Product showcase */}
           <div className="md:w-1/2 order-2 md:order-2 relative mb-6 md:mb-0 md:ml-auto">
-            <div className="relative mx-auto md:mr-0 w-[400px] h-[280px] md:w-[550px] md:h-[380px]">
+            <div className="relative mx-auto md:mr-0 w-[480px] h-[270px] md:w-[650px] md:h-[365px]">
               {/* Background glow */}
               <div 
                 className="absolute inset-0 bg-blue-600 rounded-3xl opacity-30"
@@ -213,7 +213,7 @@ export const ProductHero = () => {
                   alt="Rippa Tackle product showcase" 
                   fill
                   className="object-cover"
-                  sizes="(max-width: 768px) 400px, 550px"
+                  sizes="(max-width: 768px) 480px, 650px"
                   priority
                 />
               </div>

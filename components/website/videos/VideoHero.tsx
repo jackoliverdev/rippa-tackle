@@ -176,7 +176,7 @@ export const VideoHero = () => {
             
             {/* Video thumbnail */}
             <div className="md:w-1/2 order-2 md:order-2 relative mb-6 md:mb-0 md:ml-auto">
-              <div className="relative mx-auto md:mr-0 w-full max-w-[550px]">
+              <div className="relative mx-auto md:mr-0 w-[480px] md:w-[650px]">
                 {/* Background glow */}
                 <div 
                   className="absolute inset-0 bg-blue-600 rounded-3xl opacity-30"
