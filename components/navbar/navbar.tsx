@@ -96,26 +96,175 @@ export const NavBar = () => {
 
       <div className="w-full sticky top-0 left-0 right-0 z-50 bg-slate-900">
         {/* Top navigation with logo, search, account */}
-        <div className="container mx-auto px-4 py-3">
-          <div className="flex items-center justify-between">
+        <div className="container mx-auto px-2 py-3">
+          {/* Mobile Navigation (First Row) */}
+          <div className="flex items-center justify-between md:hidden">
+            {/* Menu button */}
+            <button 
+              onClick={() => setSideMenuOpen(true)}
+              className="text-white flex items-center px-1"
+              aria-label="Open Menu"
+            >
+              <Menu className="h-6 w-6" />
+              <span className="text-xs uppercase ml-1">Menu</span>
+            </button>
+            
             {/* Logo */}
             <Link href="/" className="flex-shrink-0">
-              <div className="flex items-center">
+              <div className="flex items-center justify-center">
                 <Image 
                   src="/rippa_logo.png" 
                   alt="Rippa Tackle"
-                  width={48} 
-                  height={48}
-                  className="h-12 w-12 mr-2" 
+                  width={42} 
+                  height={42}
+                  className="h-10 w-10 mr-2" 
                 />
-                <span className="text-xl font-bold text-white hidden md:inline">
+                <span className="text-base font-bold text-white">
+                  RIPPA <span className="text-blue-400">TACKLE</span>
+                </span>
+              </div>
+            </Link>
+            
+            {/* User actions - mobile */}
+            <div className="flex items-center space-x-4">
+              <Link href="/login" className="text-white" aria-label="Account">
+                <User className="h-5 w-5" />
+              </Link>
+              <Link href="/wishlist" className="text-white" aria-label="Wishlist">
+                <Heart className="h-5 w-5" />
+              </Link>
+              <Link href="/cart" className="text-white" aria-label="Shopping Bag">
+                <ShoppingBagIcon className="h-5 w-5" />
+              </Link>
+            </div>
+          </div>
+          
+          {/* Mobile Search Bar (Second Row) */}
+          <div className="mt-2 md:hidden">
+            <div className="relative w-full">
+              <input
+                type="text"
+                placeholder="Search for products..."
+                value={searchQuery}
+                onChange={handleSearchChange}
+                onFocus={() => setShowSearchResults(searchQuery.length > 1)}
+                className="w-full py-2 px-4 pl-10 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+              />
+              <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                {isSearching ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Search className="h-4 w-4" />
+                )}
+              </div>
+              {searchQuery.length > 0 && (
+                <button 
+                  onClick={() => {
+                    setSearchQuery("");
+                    setSearchResults([]);
+                    setShowSearchResults(false);
+                  }} 
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+              
+              {/* Search results dropdown for mobile */}
+              {showSearchResults && (
+                <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-md shadow-lg z-50">
+                  <div className="p-4">
+                    <h3 className="text-sm font-semibold text-gray-500 mb-2">TOP RESULTS</h3>
+                    {isSearching ? (
+                      <div className="py-6 text-center">
+                        <Loader2 className="h-6 w-6 mx-auto text-blue-500 animate-spin mb-2" />
+                        <p className="text-sm text-gray-500">Searching products...</p>
+                      </div>
+                    ) : searchResults.length > 0 ? (
+                      <div className="space-y-3">
+                        {searchResults.map(product => (
+                          <Link 
+                            key={product.id} 
+                            href={`/products/${product.slug}`} 
+                            className="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded"
+                            onClick={() => {
+                              setShowSearchResults(false);
+                            }}
+                          >
+                            <div className="w-12 h-12 bg-gray-100 rounded overflow-hidden flex-shrink-0">
+                              {product.images && product.images[0] ? (
+                                <Image
+                                  src={typeof product.images[0] === 'string' ? product.images[0] : product.images[0].url || ''}
+                                  alt={product.name}
+                                  width={48}
+                                  height={48}
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-500">
+                                  <ShoppingBagIcon className="h-6 w-6 text-gray-400" />
+                                </div>
+                              )}
+                            </div>
+                            <div>
+                              <p className="text-sm font-medium">{product.name}</p>
+                              <div className="flex items-center justify-between">
+                                <span className="text-sm text-blue-600 font-bold">{formatPrice(product.price)}</span>
+                                {product.category && (
+                                  <span className="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded ml-2">
+                                    {formatCategoryName(product.category)}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
+                    ) : searchQuery.length > 1 ? (
+                      <div className="py-6 text-center">
+                        <p className="text-sm text-gray-500">No products found for "{searchQuery}"</p>
+                      </div>
+                    ) : null}
+                    
+                    {searchResults.length > 0 && (
+                      <div className="mt-2 pt-2 border-t border-gray-100">
+                        <Link 
+                          href={`/search?q=${encodeURIComponent(searchQuery)}`}
+                          className="block w-full py-2 text-sm text-center text-blue-600 hover:text-blue-800"
+                          onClick={() => {
+                            setShowSearchResults(false);
+                          }}
+                        >
+                          View all results ({searchResults.length === 5 ? '5+' : searchResults.length})
+                        </Link>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center justify-between">
+            {/* Logo */}
+            <Link href="/" className="flex-shrink-0">
+              <div className="flex items-center justify-center">
+                <Image 
+                  src="/rippa_logo.png" 
+                  alt="Rippa Tackle"
+                  width={42} 
+                  height={42}
+                  className="h-10 w-10 mr-2" 
+                />
+                <span className="text-base font-bold text-white">
                   RIPPA <span className="text-blue-400">TACKLE</span>
                 </span>
               </div>
             </Link>
 
-            {/* Search bar - full width on desktop, hidden on mobile unless active */}
-            <div className={`${searchOpen ? 'flex absolute inset-x-0 top-0 bg-slate-900 p-4 z-10' : 'hidden md:flex'} flex-1 max-w-2xl mx-auto px-4`}>
+            {/* Search bar - desktop */}
+            <div className="flex flex-1 max-w-2xl mx-auto px-4">
               <div className="relative w-full">
                 <input
                   type="text"
@@ -132,7 +281,7 @@ export const NavBar = () => {
                     <Search className="h-5 w-5" />
                   )}
                 </div>
-                {searchQuery.length > 0 && !searchOpen && (
+                {searchQuery.length > 0 && (
                   <button 
                     onClick={() => {
                       setSearchQuery("");
@@ -144,16 +293,8 @@ export const NavBar = () => {
                     <X className="h-4 w-4" />
                   </button>
                 )}
-                {searchOpen && (
-                  <button 
-                    onClick={() => setSearchOpen(false)} 
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
-                  >
-                    <X className="h-5 w-5" />
-                  </button>
-                )}
                 
-                {/* Search results dropdown */}
+                {/* Search results dropdown - desktop */}
                 {showSearchResults && (
                   <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-md shadow-lg z-50">
                     <div className="p-4">
@@ -172,7 +313,6 @@ export const NavBar = () => {
                               className="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded"
                               onClick={() => {
                                 setShowSearchResults(false);
-                                if (searchOpen) setSearchOpen(false);
                               }}
                             >
                               <div className="w-12 h-12 bg-gray-100 rounded overflow-hidden flex-shrink-0">
@@ -217,7 +357,6 @@ export const NavBar = () => {
                             className="block w-full py-2 text-sm text-center text-blue-600 hover:text-blue-800"
                             onClick={() => {
                               setShowSearchResults(false);
-                              if (searchOpen) setSearchOpen(false);
                             }}
                           >
                             View all results ({searchResults.length === 5 ? '5+' : searchResults.length})
@@ -230,31 +369,25 @@ export const NavBar = () => {
               </div>
             </div>
 
-            {/* User actions - Updated to match the design in the second screenshot */}
+            {/* User actions - desktop */}
             <div className="flex items-center space-x-6">
-              <button className="md:hidden text-white" onClick={() => setSearchOpen(true)}>
-                <Search className="h-6 w-6" />
-              </button>
+              <Link href="/login" className="text-white flex flex-col items-center">
+                <User className="h-6 w-6 mb-1" />
+                <span className="text-xs">ACCOUNT</span>
+              </Link>
               
-              <div className="hidden md:flex items-center space-x-6">
-                <Link href="/login" className="text-white flex flex-col items-center">
-                  <User className="h-6 w-6 mb-1" />
-                  <span className="text-xs">ACCOUNT</span>
-                </Link>
-                
-                <WishlistDropdown />
-                
-                <CartDropdown />
-              </div>
+              <WishlistDropdown />
+              
+              <CartDropdown />
             </div>
           </div>
         </div>
         
-        {/* Main navigation */}
-        <div className="bg-slate-800 py-2 px-4 shadow-sm">
+        {/* Main navigation - desktop only */}
+        <div className="bg-slate-800 py-2 px-4 shadow-sm hidden md:block">
           <div className="container mx-auto flex items-center justify-between">
             <div className="flex items-center">
-              {/* Mobile menu button */}
+              {/* Mobile menu button - restored for desktop */}
               <button 
                 className="text-white flex items-center"
                 onClick={() => setSideMenuOpen(true)}
@@ -396,11 +529,10 @@ export const NavBar = () => {
       <WebsiteSidebar isOpen={sideMenuOpen} onClose={() => setSideMenuOpen(false)} />
       
       {/* Overlay for search results on mobile */}
-      {searchOpen && showSearchResults && (
+      {showSearchResults && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+          className="fixed inset-0 bg-black bg-opacity-50 z-40"
           onClick={() => {
-            setSearchOpen(false);
             setShowSearchResults(false);
           }}
         ></div>

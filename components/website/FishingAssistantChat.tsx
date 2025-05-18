@@ -331,7 +331,7 @@ const ChatInterface: React.FC<{
       
       <div 
         ref={chatContainerRef}
-        className="h-[350px] sm:h-[400px] overflow-y-auto p-3 md:p-4 bg-slate-50"
+        className="h-[450px] sm:h-[400px] overflow-y-auto p-3 md:p-4 bg-slate-50"
       >
         {messages.map((message, index) => (
           <div
@@ -495,14 +495,6 @@ const ChatInput: React.FC<{
           </div>
         )}
       </div>
-      <button
-        type="button" 
-        onClick={() => setShowMobileTip(true)}
-        className="md:hidden bg-blue-100 text-blue-700 p-1.5 rounded-full ml-2"
-        aria-label="Show tips"
-      >
-        <InfoIcon className="w-5 h-5" />
-      </button>
     </form>
   );
 }; 

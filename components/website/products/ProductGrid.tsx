@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { ShoppingCart, Star, Eye, ChevronDown, ChevronUp, X, Search, Loader2 } from 'lucide-react';
+import { ShoppingCart, Star, Eye, ChevronDown, ChevronUp, X, Search, Loader2, SlidersHorizontal } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Product, ProductCategory } from '@/types/product';
@@ -9,6 +9,7 @@ import { getAllProducts, getProductsByCategory, getProductsByTag, searchProducts
 import ProductQuickViewButton from './ProductQuickViewButton';
 import { PRODUCT_FILTER_EVENT } from './ProductFilterLink';
 import { WishlistButton } from './WishlistButton';
+import MobileFilterSheet from './MobileFilterSheet';
 
 // Simplified Product Card component
 const ProductCard = ({ product }: { product: Product }) => {
@@ -154,6 +155,9 @@ export const ProductGrid = ({
   // Visible subcategories based on product data
   const [subcategories, setSubcategories] = useState<{[key in ProductCategory]?: string[]}>({});
   const [allBrands, setAllBrands] = useState<string[]>([]);
+  
+  // Add state for mobile filter sheet
+  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
   
   // Toggle filter sections
   const toggleSection = (section: keyof typeof expandedSections) => {
@@ -671,17 +675,59 @@ export const ProductGrid = ({
     setShowAllProducts(true);
   };
   
+  // Function to toggle mobile filter sheet
+  const toggleMobileFilter = () => {
+    setIsMobileFilterOpen(!isMobileFilterOpen);
+  };
+  
+  // Function to handle filter changes from mobile sheet
+  const handleMobileFilterChange = (newFilters: Partial<FilterState>) => {
+    setFilters(prev => ({
+      ...prev,
+      ...newFilters
+    }));
+  };
+  
+  // Helper function to count selected filters
+  const countSelectedFilters = (): number => {
+    let count = 0;
+    if (filters.category !== 'all') count++;
+    if (filters.subcategory !== null) count++;
+    if (filters.brand !== null) count++;
+    if (filters.priceRange !== 'all') count++;
+    if (filters.onSale) count++;
+    return count;
+  };
+  
   return (
     <div id="product-grid-section" className="py-10 bg-blue-50 relative">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-slate-800">{title}</h2>
+          
+          {/* Mobile filter button */}
+          <button 
+            className="md:hidden flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg"
+            onClick={toggleMobileFilter}
+          >
+            <SlidersHorizontal className="h-4 w-4" />
+            <span>Filters</span>
+            {(filters.category !== 'all' || 
+              filters.subcategory !== null || 
+              filters.brand !== null || 
+              filters.priceRange !== 'all' || 
+              filters.onSale) && (
+              <span className="bg-white text-blue-600 rounded-full h-5 w-5 flex items-center justify-center text-xs font-bold">
+                {countSelectedFilters()}
+              </span>
+            )}
+          </button>
         </div>
         
         <div className="flex flex-col md:flex-row gap-8">
-          {/* Filters sidebar */}
+          {/* Filters sidebar - desktop only */}
           {!initialSearchQuery && (
-            <div className="w-full md:w-64 flex-shrink-0 bg-white rounded-lg shadow-sm overflow-hidden h-fit">
+            <div className="hidden md:block w-full md:w-64 flex-shrink-0 bg-white rounded-lg shadow-sm overflow-hidden h-fit">
               {/* Filters header */}
               <div className="p-4 border-b flex justify-between items-center">
                 <h3 className="font-bold text-slate-800">Filters</h3>
@@ -1033,6 +1079,17 @@ export const ProductGrid = ({
               </div>
             </div>
           )}
+          
+          {/* Mobile filter sheet */}
+          <MobileFilterSheet 
+            isOpen={isMobileFilterOpen}
+            onClose={() => setIsMobileFilterOpen(false)}
+            filters={filters}
+            onFilterChange={handleMobileFilterChange}
+            onClearFilters={clearAllFilters}
+            subcategories={subcategories}
+            brands={allBrands}
+          />
           
           {/* Products grid */}
           <div className="flex-1">

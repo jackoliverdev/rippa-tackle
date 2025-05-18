@@ -4,6 +4,7 @@ import { searchBlogs } from '@/lib/blog-service';
 import { Blog } from '@/lib/types';
 import BlogList from '@/components/website/blog/BlogList';
 import Link from 'next/link';
+import BlogSearchHero from '@/components/website/blog/BlogSearchHero';
 
 export const metadata: Metadata = {
   title: 'Search Blog | Rippa Tackle',
@@ -38,83 +39,57 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   }
   
   return (
-    <main className="container mx-auto px-4 py-12">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">Search Results</h1>
-          
+    <main>
+      {/* Hero with Search */}
+      <BlogSearchHero 
+        query={query} 
+        resultCount={query ? blogs.length : undefined}
+      />
+      
+      {/* Results Section */}
+      <div className="container mx-auto px-4 py-12">
+        <div className="max-w-7xl mx-auto">
+          {/* Results */}
           {query ? (
-            <p className="text-gray-600 dark:text-gray-400">
-              Showing results for <span className="font-semibold">"{query}"</span>
-            </p>
+            <>
+              {blogs.length > 0 ? (
+                <BlogList
+                  blogs={blogs}
+                  loading={loading}
+                  error={error || undefined}
+                  showPagination={true}
+                  itemsPerPage={9}
+                  columns={3}
+                />
+              ) : !loading && (
+                <div className="text-center py-12">
+                  <h2 className="text-2xl font-semibold mb-4">No matches found</h2>
+                  <p className="text-gray-600 dark:text-gray-400 mb-8">
+                    We couldn't find any blog posts matching "{query}". Please try different keywords.
+                  </p>
+                  <Link
+                    href="/blogs"
+                    className="inline-block bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-lg transition-colors duration-300"
+                  >
+                    View All Blogs
+                  </Link>
+                </div>
+              )}
+            </>
           ) : (
-            <p className="text-gray-600 dark:text-gray-400">
-              Enter a search term to find blog posts
-            </p>
-          )}
-          
-          {/* Search Form */}
-          <div className="mt-8 max-w-xl mx-auto">
-            <form action="/blogs/search" method="get" className="flex items-center">
-              <input
-                type="text"
-                name="query"
-                defaultValue={query || ''}
-                placeholder="Search for fishing tips, techniques..."
-                className="flex-grow px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-800 dark:text-white"
-                required
-              />
-              <button
-                type="submit"
-                className="bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-r-lg transition-colors duration-300"
-              >
-                Search
-              </button>
-            </form>
-          </div>
-        </div>
-        
-        {/* Results */}
-        {query ? (
-          <>
-            {blogs.length > 0 ? (
-              <BlogList
-                blogs={blogs}
-                loading={loading}
-                error={error || undefined}
-                showPagination={true}
-                itemsPerPage={9}
-                columns={3}
-              />
-            ) : !loading && (
-              <div className="text-center py-12">
-                <h2 className="text-2xl font-semibold mb-4">No matches found</h2>
-                <p className="text-gray-600 dark:text-gray-400 mb-8">
-                  We couldn't find any blog posts matching "{query}". Please try different keywords.
-                </p>
-                <Link
-                  href="/blogs"
-                  className="inline-block bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-lg transition-colors duration-300"
+            <div className="text-center py-12">
+              <p className="text-gray-600 dark:text-gray-400">
+                Search for blog content above or{' '}
+                <Link 
+                  href="/blogs" 
+                  className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 underline"
                 >
-                  View All Blogs
+                  browse all blogs
                 </Link>
-              </div>
-            )}
-          </>
-        ) : (
-          <div className="text-center py-12">
-            <p className="text-gray-600 dark:text-gray-400">
-              Search for blog content above or{' '}
-              <Link 
-                href="/blogs" 
-                className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 underline"
-              >
-                browse all blogs
-              </Link>
-            </p>
-          </div>
-        )}
+              </p>
+            </div>
+          )}
+        </div>
       </div>
     </main>
   );

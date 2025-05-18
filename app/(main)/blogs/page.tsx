@@ -3,6 +3,7 @@ import { Metadata } from 'next';
 import { getAllBlogs, getBlogsByCategory } from '@/lib/blog-service';
 import { Blog, BlogCategory } from '@/lib/types';
 import BlogList from '@/components/website/blog/BlogList';
+import BlogIndexHero from '@/components/website/blog/BlogIndexHero';
 
 export const metadata: Metadata = {
   title: 'Rippa Tackle Blog - Carp Fishing Tips, Tackle Reviews & More',
@@ -42,26 +43,27 @@ export default async function BlogsPage({ searchParams }: BlogsPageProps) {
   }
   
   return (
-    <main className="container mx-auto px-4 py-12">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">Fishing Blog</h1>
-          <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-            Expert advice, tutorials, and insights to help you catch more and bigger carp. Explore our extensive collection of fishing articles.
-          </p>
+    <main>
+      {/* Hero Section */}
+      <BlogIndexHero 
+        selectedCategory={category || null}
+        categories={categories}
+        postCount={blogs.length}
+      />
+      
+      <div className="container mx-auto px-4 py-12">
+        <div className="max-w-7xl mx-auto">
+          {/* Blog List with Filtering */}
+          <BlogList
+            blogs={blogs}
+            showFilters={false} // Filters are now in the hero
+            categories={categories}
+            selectedCategory={category || null}
+            showPagination={true}
+            itemsPerPage={9}
+            loading={loading}
+          />
         </div>
-        
-        {/* Blog List with Filtering */}
-        <BlogList
-          blogs={blogs}
-          showFilters={true}
-          categories={categories}
-          selectedCategory={category || null}
-          showPagination={true}
-          itemsPerPage={9}
-          loading={loading}
-        />
       </div>
     </main>
   );

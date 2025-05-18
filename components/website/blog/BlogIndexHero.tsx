@@ -1,27 +1,39 @@
 'use client';
 
-import React from 'react';
-import Image from 'next/image';
-import { ArrowRightIcon, Fish } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ArrowRightIcon, Fish, BookOpen } from 'lucide-react';
 import Link from 'next/link';
-import { Blog } from '@/lib/types';
+import Image from 'next/image';
+import { BlogCategory, Blog } from '@/lib/types';
+import { getAllBlogs } from '@/lib/blog-service';
+import BlogCard from './BlogCard';
 
-interface BlogHeroProps {
-  blog: Blog;
-  className?: string;
+interface BlogIndexHeroProps {
+  selectedCategory?: BlogCategory | null;
+  categories?: BlogCategory[];
+  postCount?: number;
 }
 
-export default function BlogHero({ blog, className = '' }: BlogHeroProps) {
-  const { title, feature_image, category, published_at, author, read_time } = blog;
+export default function BlogIndexHero({ selectedCategory, categories = [], postCount }: BlogIndexHeroProps) {
+  const [featuredBlog, setFeaturedBlog] = useState<Blog | null>(null);
   
-  const formattedDate = published_at 
-    ? new Date(published_at).toLocaleDateString('en-GB', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-      })
-    : '';
-
+  // Fetch a featured blog when component mounts
+  useEffect(() => {
+    const fetchFeaturedBlog = async () => {
+      try {
+        const blogs = await getAllBlogs();
+        if (blogs && blogs.length > 0) {
+          // Get the first blog as featured (or you could select one with a "featured" flag)
+          setFeaturedBlog(blogs[0]);
+        }
+      } catch (error) {
+        console.error('Error fetching featured blog:', error);
+      }
+    };
+    
+    fetchFeaturedBlog();
+  }, []);
+  
   return (
     <section 
       className="relative bg-blue-900 pt-12 md:pt-20 pb-20 md:pb-28" 
@@ -146,62 +158,69 @@ export default function BlogHero({ blog, className = '' }: BlogHeroProps) {
           {/* Text content */}
           <div className="md:w-1/2 order-1 md:order-1 mb-8 md:mb-0 text-center md:text-left">
             <div className="inline-flex items-center px-3 py-1 rounded-full bg-blue-700/30 text-blue-300 mb-4 border border-blue-600/20">
-              <span className="font-semibold text-sm">{category || 'Blog Post'}</span>
+              <span className="font-semibold text-sm">{selectedCategory || 'Knowledge Base'}</span>
             </div>
             
             <h1 className="text-3xl md:text-4xl xl:text-5xl font-bold text-white leading-tight mb-4">
-              {title}
+              {selectedCategory 
+                ? `${selectedCategory} Articles`
+                : "Carp Fishing Insights & Tips"
+              }
             </h1>
             
-            <div className="flex flex-wrap items-center justify-center md:justify-start text-sm text-blue-200 space-x-4 mb-6">
-              {author && (
-                <span className="flex items-center mb-2 sm:mb-0">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
-                  {author}
-                </span>
-              )}
-              
-              {formattedDate && (
-                <span className="flex items-center mb-2 sm:mb-0">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                  {formattedDate}
-                </span>
-              )}
-              
-              {read_time && (
-                <span className="flex items-center mb-2 sm:mb-0">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  {read_time} min read
-                </span>
-              )}
-            </div>
+            <p className="text-blue-100 text-lg mb-6 max-w-xl mx-auto md:mx-0">
+              Expert advice, tutorials, and insights to help you catch more and bigger carp on the bank.
+            </p>
+            
+            {/* Category pills */}
+            {categories.length > 0 && (
+              <div className="flex flex-wrap gap-2 justify-center md:justify-start mb-6">
+                <Link 
+                  href="/blogs"
+                  className={`inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                    !selectedCategory 
+                      ? 'bg-blue-600 text-white' 
+                      : 'bg-blue-800/30 text-blue-200 hover:bg-blue-700/40'
+                  }`}
+                >
+                  All
+                </Link>
+                {categories.map(category => (
+                  <Link 
+                    key={category}
+                    href={`/blogs?category=${category}`}
+                    className={`inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                      selectedCategory === category 
+                        ? 'bg-blue-600 text-white' 
+                        : 'bg-blue-800/30 text-blue-200 hover:bg-blue-700/40'
+                    }`}
+                  >
+                    {category}
+                  </Link>
+                ))}
+              </div>
+            )}
             
             <div className="flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
               <Link 
-                href="/blogs" 
+                href="/blogs/search" 
                 className="bg-blue-800/50 hover:bg-blue-700/60 text-white border border-blue-600/30 font-medium px-5 py-2.5 rounded-md inline-flex items-center justify-center transition-colors backdrop-blur-sm"
               >
-                View All Posts
+                Search Articles
               </Link>
-              <a 
-                href="#content" 
+              <Link 
+                href="/contact" 
                 className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2.5 rounded-md inline-flex items-center justify-center transition-colors shadow-lg hover:shadow-blue-500/20"
               >
-                Read Article
+                Suggest a Topic
                 <ArrowRightIcon className="ml-2 h-4 w-4" />
-              </a>
+              </Link>
             </div>
           </div>
           
-          {/* Featured Image */}
+          {/* Featured Blog Section (replacing the previous image section) */}
           <div className="md:w-1/2 order-2 md:order-2 relative mb-6 md:mb-0 md:ml-auto">
-            <div className="relative mx-auto md:mr-0 w-[400px] h-[280px] md:w-[550px] md:h-[380px]">
+            <div className="relative mx-auto md:mr-0 w-[400px] h-[400px] md:w-[550px] md:h-[500px]">
               {/* Background glow */}
               <div 
                 className="absolute inset-0 bg-blue-600 rounded-3xl opacity-30"
@@ -211,28 +230,49 @@ export default function BlogHero({ blog, className = '' }: BlogHeroProps) {
                 }}
               />
               
-              {/* Main photo */}
+              {/* Featured blog card */}
               <div className="absolute inset-0 overflow-hidden rounded-2xl shadow-2xl border-4 border-white/10">
-                {feature_image ? (
+                {featuredBlog ? (
+                  <div className="h-full w-full flex flex-col">
+                    <div className="relative h-3/5 w-full">
+                      <Image 
+                        src={featuredBlog.feature_image || "/blog_hero.jpg"} 
+                        alt={featuredBlog.title} 
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 400px, 550px"
+                        priority
+                      />
+                    </div>
+                    <div className="bg-blue-800/90 p-6 h-2/5 flex flex-col justify-between">
+                      <div>
+                        <h3 className="text-white font-bold text-xl line-clamp-2 mb-2">{featuredBlog.title}</h3>
+                        <p className="text-blue-200 line-clamp-2 text-sm">{featuredBlog.summary}</p>
+                      </div>
+                      <Link
+                        href={`/blogs/${featuredBlog.slug}`}
+                        className="inline-flex items-center justify-center mt-2 text-blue-200 hover:text-white font-medium transition-colors"
+                      >
+                        Read Featured Article
+                        <ArrowRightIcon className="ml-2 h-4 w-4" />
+                      </Link>
+                    </div>
+                  </div>
+                ) : (
                   <Image 
-                    src={feature_image} 
-                    alt={title} 
+                    src="/blog_hero.jpg" 
+                    alt="Carp fishing blog articles" 
                     fill
                     className="object-cover"
                     sizes="(max-width: 768px) 400px, 550px"
                     priority
                   />
-                ) : (
-                  <div className="w-full h-full bg-blue-800 flex items-center justify-center">
-                    <Fish className="h-20 w-20 text-blue-400" />
-                  </div>
                 )}
               </div>
               
-              {/* Category badge */}
-              <div className="absolute bottom-6 left-6 right-6 text-center z-20 bg-blue-800/80 backdrop-blur-sm p-3 rounded-xl border border-blue-700 shadow-lg">
-                <h3 className="text-white font-bold text-xl">{category || 'Fishing Insights'}</h3>
-                <p className="text-blue-200 font-medium text-sm">{author ? `By ${author}` : 'Rippa Tackle Blog'}</p>
+              {/* Blog stats badge */}
+              <div className="absolute top-6 right-6 z-20 bg-blue-800/80 backdrop-blur-sm px-4 py-2 rounded-xl border border-blue-700 shadow-lg">
+                <h3 className="text-white font-bold text-md">Featured Article</h3>
               </div>
             </div>
           </div>

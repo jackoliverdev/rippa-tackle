@@ -3,6 +3,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { ChevronLeft, ChevronRight, ZoomIn, X } from 'lucide-react';
+import { Product } from '@/types/product';
+import { WishlistButton } from './WishlistButton';
 
 interface ProductImage {
   id?: string;
@@ -15,9 +17,10 @@ interface ProductImage {
 interface ProductImageGalleryProps {
   images: ProductImage[];
   productName: string;
+  product?: Product;
 }
 
-const ProductImageGallery: React.FC<ProductImageGalleryProps> = ({ images, productName }) => {
+const ProductImageGallery: React.FC<ProductImageGalleryProps> = ({ images, productName, product }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isZoomed, setIsZoomed] = useState(false);
   const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
@@ -186,17 +189,27 @@ const ProductImageGallery: React.FC<ProductImageGalleryProps> = ({ images, produ
           </div>
         )}
         
-        {/* Zoom button */}
-        <button 
-          onClick={(e) => {
-            e.stopPropagation();
-            handleZoomToggle();
-          }}
-          className="absolute top-4 right-4 p-2 bg-white/70 hover:bg-white rounded-full shadow-md z-10 focus:outline-none"
-          aria-label={isZoomed ? "Exit zoom" : "Zoom image"}
-        >
-          {isZoomed ? <X size={20} /> : <ZoomIn size={20} />}
-        </button>
+        {/* Action buttons container */}
+        <div className="absolute top-4 right-4 flex gap-2 z-10">
+          {/* Wishlist button - ADDED */}
+          {product && (
+            <div onClick={(e) => e.stopPropagation()}>
+              <WishlistButton product={product} size="md" />
+            </div>
+          )}
+          
+          {/* Zoom button */}
+          <button 
+            onClick={(e) => {
+              e.stopPropagation();
+              handleZoomToggle();
+            }}
+            className="p-2 bg-white/70 hover:bg-white rounded-full shadow-md focus:outline-none"
+            aria-label={isZoomed ? "Exit zoom" : "Zoom image"}
+          >
+            {isZoomed ? <X size={20} /> : <ZoomIn size={20} />}
+          </button>
+        </div>
         
         {/* Navigation arrows (only visible when not zoomed) */}
         {images.length > 1 && !isZoomed && (

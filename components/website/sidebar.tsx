@@ -40,6 +40,7 @@ export default function WebsiteSidebar({ isOpen, onClose }: SidebarProps) {
   
   // Expanded category states
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
+  const [expandedSection, setExpandedSection] = useState<string | null>(null);
 
   // Fetch product categories when the component mounts
   useEffect(() => {
@@ -111,6 +112,15 @@ export default function WebsiteSidebar({ isOpen, onClose }: SidebarProps) {
     }
   };
 
+  // Toggle section expansion (account, content)
+  const toggleSection = (sectionId: string) => {
+    if (expandedSection === sectionId) {
+      setExpandedSection(null);
+    } else {
+      setExpandedSection(sectionId);
+    }
+  };
+
   // Handle navigation and close sidebar
   const handleLinkClick = (e: React.MouseEvent, href: string) => {
     if (!href.startsWith('/products?') || pathname !== '/products') {
@@ -139,16 +149,20 @@ export default function WebsiteSidebar({ isOpen, onClose }: SidebarProps) {
       >
         <div className="flex items-center justify-between p-3 border-b border-slate-800">
           <div className="flex items-center">
-            <Image 
-              src="/rippa_logo.png" 
-              alt="Rippa Tackle"
-              width={32} 
-              height={32}
-              className="h-8 w-8 mr-2" 
-            />
-            <h2 className="text-base font-bold text-white">
-              RIPPA <span className="text-blue-400">TACKLE</span>
-            </h2>
+            <Link href="/">
+              <div className="flex items-center">
+                <Image 
+                  src="/rippa_logo.png" 
+                  alt="Rippa Tackle"
+                  width={32} 
+                  height={32}
+                  className="h-8 w-8 mr-2" 
+                />
+                <h2 className="text-base font-bold text-white">
+                  RIPPA <span className="text-blue-400">TACKLE</span>
+                </h2>
+              </div>
+            </Link>
           </div>
           <button 
             onClick={onClose}
@@ -247,7 +261,7 @@ export default function WebsiteSidebar({ isOpen, onClose }: SidebarProps) {
           </div>
         </div>
         
-        <div className="overflow-y-auto h-[calc(100vh-140px)]">
+        <div className="overflow-y-auto h-[calc(100vh-200px)] pb-16">
           {/* Category links */}
           <div className="mt-2">
             <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider px-3 mb-1.5">Shop by category</h3>
@@ -633,82 +647,104 @@ export default function WebsiteSidebar({ isOpen, onClose }: SidebarProps) {
             </div>
           </div>
           
-          {/* Account section */}
+          {/* Account section - now collapsible */}
           <div className="mt-3 pt-2 border-t border-slate-800">
-            <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider px-3 mb-1.5">Your account</h3>
-            <Link 
-              href="/login" 
-              className="flex items-center px-3 py-1.5 text-slate-300 hover:bg-slate-800 transition-colors"
-              onClick={onClose}
+            <div 
+              className="flex items-center justify-between px-3 py-1.5 text-slate-300 hover:bg-slate-800 transition-colors cursor-pointer"
+              onClick={() => toggleSection('account')}
             >
-              <User className="h-4 w-4 mr-3 text-slate-400" />
-              <span className="text-sm">My Account</span>
-            </Link>
-            <Link 
-              href="/wishlist" 
-              className="flex items-center px-3 py-1.5 text-slate-300 hover:bg-slate-800 transition-colors"
-              onClick={onClose}
-            >
-              <Heart className="h-4 w-4 mr-3 text-slate-400" />
-              <span className="text-sm">Wishlist</span>
-            </Link>
-            <Link 
-              href="/cart" 
-              className="flex items-center px-3 py-1.5 text-slate-300 hover:bg-slate-800 transition-colors"
-              onClick={onClose}
-            >
-              <ShoppingBag className="h-4 w-4 mr-3 text-slate-400" />
-              <span className="text-sm">Shopping Bag</span>
-            </Link>
+              <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Your account</h3>
+              {expandedSection === 'account' ? (
+                <ChevronDown className="h-3.5 w-3.5 text-slate-500" />
+              ) : (
+                <ChevronRight className="h-3.5 w-3.5 text-slate-500" />
+              )}
+            </div>
+            
+            {expandedSection === 'account' && (
+              <div className="mt-1">
+                <Link 
+                  href="/login" 
+                  className="flex items-center px-3 py-1.5 text-slate-300 hover:bg-slate-800 transition-colors"
+                  onClick={onClose}
+                >
+                  <User className="h-4 w-4 mr-3 text-slate-400" />
+                  <span className="text-sm">My Account</span>
+                </Link>
+                <Link 
+                  href="/wishlist" 
+                  className="flex items-center px-3 py-1.5 text-slate-300 hover:bg-slate-800 transition-colors"
+                  onClick={onClose}
+                >
+                  <Heart className="h-4 w-4 mr-3 text-slate-400" />
+                  <span className="text-sm">Wishlist</span>
+                </Link>
+                <Link 
+                  href="/cart" 
+                  className="flex items-center px-3 py-1.5 text-slate-300 hover:bg-slate-800 transition-colors"
+                  onClick={onClose}
+                >
+                  <ShoppingBag className="h-4 w-4 mr-3 text-slate-400" />
+                  <span className="text-sm">Shopping Bag</span>
+                </Link>
+              </div>
+            )}
           </div>
           
-          {/* Content section: Videos, Blogs, About */}
+          {/* Content section: Videos, Blogs, About - now collapsible */}
           <div className="mt-3 pt-2 border-t border-slate-800">
-            <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider px-3 mb-1.5">Content</h3>
-            <Link 
-              href="/videos" 
-              className="flex items-center px-3 py-1.5 text-slate-300 hover:bg-slate-800 transition-colors"
-              onClick={onClose}
+            <div 
+              className="flex items-center justify-between px-3 py-1.5 text-slate-300 hover:bg-slate-800 transition-colors cursor-pointer"
+              onClick={() => toggleSection('content')}
             >
-              <VideoIcon className="h-4 w-4 mr-3 text-slate-400" />
-              <span className="text-sm">Videos</span>
-            </Link>
-            <Link 
-              href="/blogs" 
-              className="flex items-center px-3 py-1.5 text-slate-300 hover:bg-slate-800 transition-colors"
-              onClick={onClose}
-            >
-              <FileText className="h-4 w-4 mr-3 text-slate-400" />
-              <span className="text-sm">Blogs</span>
-            </Link>
-            <Link 
-              href="/about" 
-              className="flex items-center px-3 py-1.5 text-slate-300 hover:bg-slate-800 transition-colors"
-              onClick={onClose}
-            >
-              <Users className="h-4 w-4 mr-3 text-slate-400" />
-              <span className="text-sm">About</span>
-            </Link>
+              <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Content</h3>
+              {expandedSection === 'content' ? (
+                <ChevronDown className="h-3.5 w-3.5 text-slate-500" />
+              ) : (
+                <ChevronRight className="h-3.5 w-3.5 text-slate-500" />
+              )}
+            </div>
+            
+            {expandedSection === 'content' && (
+              <div className="mt-1">
+                <Link 
+                  href="/videos" 
+                  className="flex items-center px-3 py-1.5 text-slate-300 hover:bg-slate-800 transition-colors"
+                  onClick={onClose}
+                >
+                  <VideoIcon className="h-4 w-4 mr-3 text-slate-400" />
+                  <span className="text-sm">Videos</span>
+                </Link>
+                <Link 
+                  href="/blogs" 
+                  className="flex items-center px-3 py-1.5 text-slate-300 hover:bg-slate-800 transition-colors"
+                  onClick={onClose}
+                >
+                  <FileText className="h-4 w-4 mr-3 text-slate-400" />
+                  <span className="text-sm">Blogs</span>
+                </Link>
+                <Link 
+                  href="/about" 
+                  className="flex items-center px-3 py-1.5 text-slate-300 hover:bg-slate-800 transition-colors"
+                  onClick={onClose}
+                >
+                  <Users className="h-4 w-4 mr-3 text-slate-400" />
+                  <span className="text-sm">About</span>
+                </Link>
+              </div>
+            )}
           </div>
         </div>
         
-        {/* AI Fishing Assistant - More prominent at bottom */}
-        <div className="absolute bottom-0 left-0 right-0 border-t border-blue-900/50">
+        {/* AI Fishing Assistant - Better button at bottom */}
+        <div className="absolute bottom-0 left-0 right-0 p-4 bg-slate-900 border-t border-slate-800">
           <Link
             href="/fishing-assistant"
-            className="flex items-center justify-between py-3 px-4 bg-gradient-to-r from-blue-800 to-blue-700 hover:from-blue-700 hover:to-blue-600 transition-all"
+            className="flex items-center justify-center py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-medium rounded-md shadow-md transition-all"
             onClick={onClose}
           >
-            <div className="flex items-center">
-              <div className="flex items-center justify-center bg-blue-600 rounded-full h-8 w-8 mr-3">
-                <Brain className="h-5 w-5 text-white" />
-              </div>
-              <div>
-                <span className="text-sm font-medium text-white block">AI Fishing Assistant</span>
-                <span className="text-xs text-blue-200">Get expert fishing advice</span>
-              </div>
-            </div>
-            <ChevronRight className="h-4 w-4 text-blue-300" />
+            <Brain className="h-5 w-5 mr-2" />
+            <span>AI Fishing Assistant</span>
           </Link>
         </div>
       </div>

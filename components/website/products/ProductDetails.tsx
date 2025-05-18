@@ -8,8 +8,8 @@ import { getProductBySlug } from '@/lib/products-service';
 import { ShoppingBag, Star, ArrowLeft, Tag, Check } from 'lucide-react';
 import { ProductVariant, Product } from '@/types/product';
 import ProductImageGallery from './ProductImageGallery';
-import { WishlistButton } from './WishlistButton';
 import { AddToCartButton } from './AddToCartButton';
+import { WishlistButton } from './WishlistButton';
 
 type ProductDetailsProps = {
   slug: string;
@@ -114,6 +114,7 @@ export default function ProductDetails({ slug }: ProductDetailsProps) {
                 <ProductImageGallery 
                   images={product.images} 
                   productName={product.name} 
+                  product={product}
                 />
               ) : (
                 <div className="w-full aspect-square bg-slate-200 flex items-center justify-center rounded-lg">
@@ -216,10 +217,25 @@ export default function ProductDetails({ slug }: ProductDetailsProps) {
                     showText={true}
                     className="flex-1"
                   />
-                  
-                  <WishlistButton product={product} size="lg" />
                 </div>
               </div>
+              
+              {/* Specifications - MOVED FROM BOTTOM */}
+              {product.specifications && Object.keys(product.specifications).length > 0 && (
+                <div className="mb-8 border rounded-lg overflow-hidden">
+                  <h3 className="text-lg font-bold text-slate-900 px-4 py-3 bg-slate-50 border-b">Specifications</h3>
+                  <table className="min-w-full divide-y divide-slate-200">
+                    <tbody className="divide-y divide-slate-200">
+                      {Object.entries(product.specifications).map(([key, value]) => (
+                        <tr key={key}>
+                          <td className="py-3 px-4 text-sm font-medium text-slate-900 bg-slate-50 w-1/3">{key}</td>
+                          <td className="py-3 px-4 text-sm text-slate-700">{value}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
               
               {/* Features/Highlights */}
               {product.features && product.features.length > 0 && (
@@ -268,25 +284,6 @@ export default function ProductDetails({ slug }: ProductDetailsProps) {
                       .replace(/<\/?span>/gi, '')
                   }} />
                 </div>
-                
-                {/* Specifications */}
-                {product.specifications && Object.keys(product.specifications).length > 0 && (
-                  <div className="mt-10">
-                    <h3 className="text-xl font-bold text-slate-900 mb-4">Specifications</h3>
-                    <div className="border rounded-lg overflow-hidden">
-                      <table className="min-w-full divide-y divide-slate-200">
-                        <tbody className="divide-y divide-slate-200">
-                          {Object.entries(product.specifications).map(([key, value]) => (
-                            <tr key={key}>
-                              <td className="py-3 px-4 text-sm font-medium text-slate-900 bg-slate-50 w-1/3">{key}</td>
-                              <td className="py-3 px-4 text-sm text-slate-700">{value}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
           )}
