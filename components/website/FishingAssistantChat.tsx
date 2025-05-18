@@ -411,43 +411,14 @@ const ChatInterface: React.FC<{
         )}
       </div>
       
-      <form onSubmit={sendMessage} className="p-4 sm:p-5 border-t border-slate-200 bg-white">
-        <div className="flex items-center gap-2 relative">
-          {/* Main input field */}
-          <div className="relative flex-grow">
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder={window.innerWidth < 640 ? "Ask a fishing question..." : "Ask about fishing spots, species, techniques..."}
-              className="w-full bg-slate-100 border-0 rounded-full py-3 pl-4 pr-12 text-sm sm:text-base text-slate-800 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white transition-all shadow-sm"
-              disabled={isLoading}
-            />
-            
-            {/* Send button - positioned inside the input on mobile */}
-            <button
-              type="submit"
-              aria-label="Send message"
-              className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center justify-center bg-gradient-to-r from-blue-700 to-blue-600 hover:from-blue-800 hover:to-blue-700 active:from-blue-800 active:to-blue-800 text-white w-10 h-10 rounded-full disabled:opacity-60 transition-all duration-200 shadow-md"
-              disabled={isLoading || !input.trim()}
-            >
-              <Send className="h-5 w-5" />
-            </button>
-          </div>
-        </div>
-        
-        {/* Loading indicator - shown below input when loading */}
-        {isLoading && (
-          <div className="flex items-center mt-2 text-xs text-slate-500 pl-2">
-            <div className="flex space-x-1 items-center">
-              <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></div>
-              <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse delay-150"></div>
-              <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse delay-300"></div>
-            </div>
-            <span className="ml-2">Sending message...</span>
-          </div>
-        )}
-      </form>
+      <ChatInput
+        input={input}
+        setInput={setInput}
+        handleSend={sendMessage}
+        isLoading={isLoading}
+        isTypingMessage={false}
+        setShowMobileTip={setShowMobileTip}
+      />
     </div>
   );
 };
@@ -468,4 +439,70 @@ const Fish = ({ className }: { className?: string }) => (
     <path d="M18 19a6 6 0 0 0 0-12c-4 0-7.5 1-10 3v6c2.5 2 6 3 10 3Z"/>
     <path d="m2 16 3-4-3-4"/>
   </svg>
-); 
+);
+
+const ChatInput: React.FC<{
+  input: string;
+  setInput: React.Dispatch<React.SetStateAction<string>>;
+  handleSend: (e: React.FormEvent) => Promise<void>;
+  isLoading: boolean;
+  isTypingMessage: boolean;
+  setShowMobileTip: React.Dispatch<React.SetStateAction<boolean>>;
+}> = ({ input, setInput, handleSend, isLoading, isTypingMessage, setShowMobileTip }) => {
+  const [placeholder, setPlaceholder] = useState("Ask a fishing question...");
+  
+  // Set placeholder based on screen size on client-side only
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setPlaceholder(window.innerWidth < 640 
+        ? "Ask a fishing question..." 
+        : "Ask about fishing spots, species, techniques...");
+        
+      // Update placeholder on resize
+      const handleResize = () => {
+        setPlaceholder(window.innerWidth < 640 
+          ? "Ask a fishing question..." 
+          : "Ask about fishing spots, species, techniques...");
+      };
+      
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+    }
+  }, []);
+  
+  return (
+    <form onSubmit={handleSend} className="flex items-center bg-white border border-blue-200 rounded-lg shadow-sm">
+      <div className="w-full flex items-center">
+        <input
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder={placeholder}
+          className="w-full px-4 py-3 rounded-l-lg outline-none text-slate-700"
+          disabled={isLoading}
+        />
+        {!isLoading ? (
+          <button
+            type="submit"
+            disabled={!input.trim() || isLoading}
+            className="bg-blue-700 text-white rounded-r-lg p-3 hover:bg-blue-800 transition-colors disabled:opacity-50"
+          >
+            <Send className="w-5 h-5" />
+          </button>
+        ) : (
+          <div className="bg-blue-700 text-white rounded-r-lg p-3">
+            <Loader2 className="w-5 h-5 animate-spin" />
+          </div>
+        )}
+      </div>
+      <button
+        type="button" 
+        onClick={() => setShowMobileTip(true)}
+        className="md:hidden bg-blue-100 text-blue-700 p-1.5 rounded-full ml-2"
+        aria-label="Show tips"
+      >
+        <InfoIcon className="w-5 h-5" />
+      </button>
+    </form>
+  );
+}; 

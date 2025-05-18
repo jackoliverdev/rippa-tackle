@@ -11,6 +11,24 @@ const nextConfig = {
       'i.ytimg.com'
     ],
   },
+  experimental: {
+    workerThreads: false,
+  },
+  // Force all API routes to be treated as Edge-compatible for static builds
+  // This prevents the 'Dynamic Server Usage' errors during build
+  async headers() {
+    return [
+      {
+        source: '/api/:path*',
+        headers: [
+          {
+            key: 'x-api-route',
+            value: 'edge',
+          },
+        ],
+      },
+    ];
+  },
 }
 
 module.exports = nextConfig
