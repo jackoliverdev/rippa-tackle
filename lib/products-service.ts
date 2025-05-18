@@ -171,6 +171,23 @@ export async function getSaleProducts(limit = 8): Promise<Product[]> {
   }
 }
 
+// Function to get random products for the purchase notifications
+export async function getRandomProducts(limit = 10): Promise<Product[]> {
+  try {
+    const allProducts = await fetchFromAPI('products');
+    if (!Array.isArray(allProducts) || allProducts.length === 0) return [];
+    
+    // Shuffle the products array
+    const shuffled = [...allProducts].sort(() => 0.5 - Math.random());
+    
+    // Return the first n products
+    return shuffled.slice(0, limit);
+  } catch (error) {
+    console.error('Error fetching random products:', error);
+    return [];
+  }
+}
+
 // Admin specific functions
 
 export async function createProduct(product: Partial<Product>): Promise<Product | null> {
