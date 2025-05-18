@@ -118,11 +118,6 @@ export const RippaTackleDashboard: FC = () => {
                 <Tag className="w-4 h-4 text-blue-600" />
                 <span className="text-sm font-medium">Special Offers</span>
               </Link>
-              <Link href="/app/profile" 
-                className="flex items-center gap-2 p-2 rounded-md hover:bg-blue-50 transition-colors">
-                <User className="w-4 h-4 text-blue-600" />
-                <span className="text-sm font-medium">Edit Profile</span>
-              </Link>
             </div>
           </CardContent>
         </Card>

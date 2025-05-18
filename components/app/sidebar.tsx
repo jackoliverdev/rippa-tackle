@@ -44,7 +44,6 @@ export default function DashboardSidebar() {
         <SidebarLink href="/app" icon={<Home className="w-5 h-5" />}>Dashboard</SidebarLink>
         <SidebarLink href="/app/orders" icon={<ShoppingCart className="w-5 h-5" />}>Orders</SidebarLink>
         <SidebarLink href="/app/fishing-assistant" icon={<Fish className="w-5 h-5" />}>Fishing Assistant</SidebarLink>
-        <SidebarLink href="/app/profile" icon={<User className="w-5 h-5" />}>Profile</SidebarLink>
       </nav>
       <div className="mt-auto pt-8 space-y-4 flex flex-col items-start">
         {user?.email?.toLowerCase() === "jackoliverdev@gmail.com" && (

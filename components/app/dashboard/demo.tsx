@@ -22,7 +22,6 @@ import {
   LineElement
 } from 'chart.js';
 import { Bar, Line } from 'react-chartjs-2';
-import { RecentOrders } from "@/components/app/profile/RecentOrders";
 
 // Register ChartJS components
 ChartJS.register(
@@ -275,11 +274,7 @@ export function CustomerDashboardDemo() {
           </CardContent>
         </Card>
       </div>
-      
-      {/* Recent Orders */}
-      <div className="mb-4">
-        <RecentOrders />
-      </div>
+    
       
       {/* Recommended Products - Similar to BestSellers */}
       <div className="mb-4">
